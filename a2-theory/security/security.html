@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link href="../../styles.css" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="../../favicon.svg">
+    <title>Chapter 17 - Security</title>
+    <style>
+        :root {
+            --primary: #ffbe0b;
+            --primary-accent: #fde39b;
+            --secondary: #ff8d0b;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Chapter 17 - Security</h1>
+        <h2>Cambridge International (9618) Computer Science - 2024/2025 Syllabus</h2>
+        <p class="license"><span property="dct:title">Notes by @siby</span> by <span
+                property="cc:attributionName">Sachintha Senanayake</span> is licensed under <a
+                href="http://creativecommons.org/licenses/by-nc-sa/4.0/?ref=chooser-v1" target="_blank"
+                rel="license noopener noreferrer" style="display: inline-block">CC BY-NC-SA 4.0<img
+                    src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1"
+                    alt="Creative Commons"><img
+                    src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1"
+                    alt="Attribution"><img
+                    src="https://mirrors.creativecommons.org/presskit/icons/nc.svg?ref=chooser-v1"
+                    alt="NonCommercial"><img
+                    src="https://mirrors.creativecommons.org/presskit/icons/sa.svg?ref=chooser-v1" alt="ShareAlike"></a>
+        </p>
+    </header>
+    <section>
+        <h3>17.1 - Show understanding of how encryption works</h3>
+        <h4>Encryption</h4>
+        <ul>
+            <li><b>Cryptography</b> is the practice and study of techniques for communicating securely.</li>
+            <li><b>Encryption</b> - a technique used in Cryptography - is the process of scrambling data into an
+                unreadable format for any individual for whom the data is not intended.</li>
+            <li>A <b>key</b> is a piece of information (i.e. string, number, etc.) that is used by an
+                encryption/decryption algorithm to encrypt/decrypt data in an algorithmic manner (aka. <i>secret
+                    key</i>)</li>
+            <li>This way, only the intended recipient - who has the key - can understand (i.e. <i>decrypt</i>) the
+                encrypted message.</li>
+        </ul>
+        <h4>Terminology</h4>
+        <ul>
+            <li><b>Eavesdropper</b>: A person who intercepts data being transmitted.</li>
+            <li><b>Plain Text</b>: The original text before being put through an encryption algorithm</li>
+            <li><b>Cipher Text</b>: The encrypted text that is formed by putting plaintext through an encryption
+                algorithm.</li>
+            <li><b>Cipher</b>: The encryption/decryption algorithm.</li>
+        </ul>
+        <h4>Symmetric Key Cryptography</h4>
+        <ul>
+            <li>Uses the <b>same secret key</b> for both encrypting and decrypting a message.</li>
+            <li>To achieve this, the <b>secret key must also be transmitted</b> along with the message.</li>
+            <li>Examples: <i>AES (Advanced Encryption Standard), RC4/5/6 (Rivest Cipher 4/5/6), Blowfish, etc.</i></li>
+        </ul>
+        <figure><img src="a2-theory-security-1.svg" alt="a2-theory-security-1">
+            <figcaption>Figure 17.1 - Symmetric Key Encryption Process</figcaption>
+        </figure>
+        <ul>
+            <li>Symmetric key encryption results in the <b>key distribution problem</b>: the security issue posed by the
+                risk of the secret key being intercepted by an eavesdropper.</li>
+            <li>This can be prevented using a <i>key derivation function (KDF)</i>, which prevents the encryption keys
+                from being directly transmitted, but be derived at the sender's or recipient's device:</li>
+        </ul>
+        <figure><img src="a2-theory-security-2.svg" alt="a2-theory-security-2">
+            <figcaption>Figure 17.2 - Key Derivation Function - Simplified Process</figcaption>
+        </figure>
+        <ol>
+            <li>The sender and receiver generate their <i>secret key</i>; independently of each other.</li>
+            <li>They use a <b>modulo function</b> <code>F(X)</code> to generate respective <i>remainder</i> values.</li>
+            <li>The sender and receiver exchange their remainder values <code>R<sub>S</sub></code> and
+                <code>R<sub>R</sub></code>.</li>
+            <li>They use the same <b>modulo function, but substitute the bases with the exchanged remainders</b> (we
+                will call this function <code>G(X)</code>) to generate a final secret key - which should be the same for
+                both the receiver and sender.</li>
+        </ol>
+        <ul>
+            <li>This final key serves as the <b>symmetric encryption key</b>.</li>
+            <li>Notice how neither sender nor receiver transmitted this final key but derived it using remainder pairs -
+                thus solving the key distribution problem.</li>
+        </ul>
+        <h4>Asymmetric Key Cryptography</h4>
+        <ul>
+            <li>Uses a <b>public key</b> for encrypting and a <b>private key</b> for decrypting a message (i.e.
+                <i>different keys</i>) - <i>except when used in conjuction with sender verification (see below)</i>
+                <ul>
+                    <li>A public key is <i>known to all users (often distributed across the internet)</i>.</li>
+                    <li>A private key is <i>known only by a single user (kept secret)</i>.</li>
+                </ul>
+            </li>
+            <li>The public key and private key are <b>mathematically related</b>, but cannot be derived from one
+                another. Think of a <i>remainder</i> after division; with just the remainder, you can't figure out
+                <b>what numbers were divided to get this remainder.</b> Therefore, <i>modular arithmetic and prime
+                    numbers</i> are used in most public-private key generator algorithms to generate <i>virtually
+                    unbreakable key pairs</i>.</li>
+            <li>Another important thing to understand is that the encryption algorithms used under asymmetric key
+                cryptography (denoted as <code>E</code> in the following diagrams) <i>may use</i> either a private or
+                public key to encrypt. Correspondingly, the decryption function (denoted as <code>D</code> in the
+                following diagrams) <b>must use the <i>counter</i> key to decrypt the message; i.e. public if private,
+                    private if public.</b></li>
+            <li>Examples: <i>RSA (Rivest, Shamir and Adleman), D-H (Diffie-Hellman Key Exchange), ECC (Elliptic Curve
+                    Cryptography), etc.</i></li>
+        </ul>
+        <figure><img src="a2-theory-security-3.svg" alt="a2-theory-security-3">
+            <figcaption>Figure 17.3 - Asymmetric Key Encryption Process</figcaption>
+        </figure>
+        <ol>
+            <li>The receiver <code>(R)</code> <b>generates its own public and private key pair</b> using a <i>key
+                    generator algorithm</i>. The receiver will transmit <b>just its public key</b> across the internet
+                to the sender before the transmission begins.</li>
+            <li>When the sender wants to send a message to the receiver, it will use the <b>receiver's public key
+                    <code>(K<sup>R</sup><sub>public</sub>)</code></b> to encrypt the plaintext into ciphertext.</li>
+            <li>This ciphertext is then transmitted across the internet to the receiver.</li>
+            <li>The receiver will use <b>its private key <code>(K<sup>R</sup><sub>private</sub>)</code></b> to decrypt
+                the message back into plaintext.</li>
+        </ol>
+        <ul>
+            <li>If the receiver wants to send a message back to the sender, the same process will be repeated but with
+                <b>the sender's public and private key pairs.</b> Hence, the key pair used depends on the recipient.
+            </li>
+            <li>However, this process doesn't <b>guarantee the authenticity of the sender</b>, as the receiver's public
+                key could be with anyone. To solve this problem, we encrypt our data twice:</li>
+        </ul>
+        <figure><img src="a2-theory-security-4.svg" alt="a2-theory-security-4">
+            <figcaption>Figure 17.4 - Asymmetric Key Encryption w/ Sender Verification</figcaption>
+        </figure>
+        <ol>
+            <li>The receiver <code>(R)</code> and the sender <code>(S)</code> share their <b>public keys</b> with each
+                other - across the internet - before transmission begins.</li>
+            <li>Unlike earlier, the sender will first <b>encrypt the data using its private key
+                    <code>(K<sup>S</sup><sub>private</sub>)</code></b> to produce an <i>initial cipher text
+                    <code>C<sub>1</sub></code></i>.</li>
+            <li>This is passed through another round of encryption but now using the <b>receiver's public key
+                    <code>(K<sup>R</sup><sub>public</sub>)</code></b> to produce the <i>final cipher text
+                </i><code>C<sub>2</sub></code>.</li>
+            <li>This ciphertext <code>C<sub>2</sub></code> is transmitted across the internet to the receiver
+                <code>(R)</code>.</li>
+            <li>To decrypt the received ciphertext, the receiver will use <b>its private key
+                    <code>(K<sup>R</sup><sub>private</sub>)</code> to obtain the initial cipher text
+                    <code>C<sub>1</sub></code>.</b></li>
+            <li>To obtain the original ciphertext, the receiver will use the <b>sender's public key
+                    <code>(K<sup>S</sup><sub>public</sub>)</code>.</b></li>
+        </ol>
+        <ul>
+            <li>In order for <b>Step 6</b> to work, the plaintext <b>should've been encrypted using the sender's private
+                    key first</b>. This can only happen if the message was truly the sender's, thus helping verify its
+                authenticity.</li>
+            <li>However, this process doesn't guarantee the <b>integrity</b><i> (i.e. whether the data was tampered with
+                    / changed during transfer)</i> of the data, which can be solved by using a <i>digital signature</i>
+                (see below)</li>
+        </ul>
+        <h4>Quantum Cryptography</h4>
+        <ul>
+            <li>Quantum Cryptography is a form of cryptography that utilizes <b>quantum mechanics</b> to produce a
+                virtually unbreakable encryption system. This field of study involves several key concepts:<ul>
+                    <li><b>Qubits (i.e. Quantum Bits)</b>: A 2-state unit of information in quantum computing that can
+                        represent a 0 or 1 <i>at the same time (i.e. superposition)</i> but <i>probabilistically
+                            collapses into one when measured.</i> Qubits are usually electrons or photons.</li>
+                    <li><b>Superposition</b>: The ability of a quantum bit to be in multiple states simultaneously until
+                        it is measured - mathematically definded by the <i>Schrödinger equation</i>.</li>
+                    <li><b>Entanglement</b>: The ability for 2 quantum bits to be connected and affect each other even
+                        if those particles are light-years apart.</li>
+                    <li><b>Polarizing Filter</b>: A device (i.e. filter) that allows photons oscillating parallel to it
+                        to are observed through, while absorbing those photos oscillating perpendicular to it.</li>
+                    <li><b>Beam Splitter</b>: A device that causes incoming photons oscillating in a particular plane to
+                        <i>probabilistically split</i> into components of that plane.</li>
+                </ul>
+            </li>
+            <li>The primary purpose of quantum cryptography is to <b>enable the secure distribution of cryptographic
+                    keys between 2 parties</b>, ensuring that <i>any attempt at eavesdropping or tampering with the key
+                    exchange process can be detected.</i></li>
+            <li><b>Quantum Key Distribution (QKD)</b> is a protocol which utilizes quantum mechanics to securely
+                transfer encryption keys over fibre optic networks. As stated, this protocol only focuses on
+                transferring cryptographic keys between a sender and a receiver, and <i>not the encryption of the
+                    transferred data itself.</i></li>
+            <li>Given below is <b>Charles Bennett's and Gilles Brassard's implementation of QKD</b> in 1984 <i>- known
+                    as the BB84 scheme</i>:</li>
+        </ul>
+        <figure><img src="a2-theory-security-5.svg" alt="a2-theory-security-5" style="max-height: 600px">
+            <figcaption>Figure 17.5 - Simplified BB84 QKD Scheme</figcaption>
+        </figure>
+        <ol>
+            <li>The sender generates <b>unpolarized photons</b> using a light source <code>(L)</code>. Each photon
+                represents a quantum bit of information.</li>
+            <li>The sender selects a <b>random sequence of polarization filters</b>.</li>
+            <li><b>Each unpolarized photon is passed through the respective random polarization filter</b>. This causes
+                the photons to be <i>polarized perpendicular to the plane of the polarizing filter</i>.</li>
+            <li>Using a <b>photon-bit map</b>, the polarized photons are encoded into binary 1s and 0s.</li>
+            <li>The encoded photons are transmitted across the internet via a fiber optic cable.</li>
+            <li>The receiver selects a <b>random sequence of beam splitters</b>. There are 2 kinds of beam splitters;
+                <b>rectilinear and diagonal</b>.</li>
+            <li>The receiver passes the incoming <i>polarized photons</i> through the randomly selected sequence of beam
+                splitters. This is referred to as <i>observing the quantum bit</i>:<ul>
+                    <li>When <b>horizontally / vertically polarized photons</b> are observed through a <b>rectilinear
+                            splitter</b>, the emerging photon is exactly that passed in.</li>
+                    <li>When <b>horizontally / vertically polarized photons</b> are observed through a <b>diagonal
+                            splitter</b>, the emerging photon is <i>maximally uncertain.</i> This means that the
+                        emerging photon has a <i>50% chance</i> of oscillating vertically, and a <i>50% chance</i> of
+                        oscillating horizontally. Hence the emerging photon exists in a <b>superposed state</b> which
+                        <i>collapses into 1 of the 2 oscillating planes probabilistically</i>.</li>
+                    <li>The same principles apply to <b>diagonally polarized photons</b> passing through a
+                        <b>rectilinear / diagonal splitter</b>.</li>
+                </ul>
+            </li>
+            <li>As a result of observation, those superposed photons will <b>probabilistically collapse into one plane
+                    or the other</b>, while the photons that passed through beam splitters that had the same plane of
+                polarization as that of their polarizing filter <b>are observed through unaltered</b>.</li>
+            <li>This results in a bit sequence - looked up from the same <i>photon-bit map</i> that <b>may have some
+                    bits altered</b><i> (i.e. see the blue color bit)</i></li>
+            <li>To ensure that the <b>receiver's beam splitters</b> are in line with the <b>sender's polarizing
+                    filters</b>, the receiver <b>transmits its beam splitter sequence to the sender.</b></li>
+            <li>The sender <b>replies with any corrections to the beam splitters</b> by observing the bit sequence the
+                receiver calculated with that of itself. <b>This synchronizes the 2 parties for the duration of the
+                    communication.</b></li>
+        </ol>
+        <ul>
+            <li>The most important feature of QKD is <b>how it deals with eavesdroppers;</b> if an eavesdropper used its
+                own sequence of beam splitters to <i>observe the photons under transmission</i>, <b>the emerging photons
+                    will be altered.</b></li>
+            <li>Therefore, the receiver will realize that <i>in places where the photon measurements must correlate,
+                    they will not correlate</i>. Thus, <b>the eavesdropper is detected and a new key is generated;</b>
+                this process is described by the <i>no-cloning theorem</i>.</li>
+        </ul>
+        <h5 class="good">Advantages of Quantum Cryptography</h5>
+        <ol class="good">
+            <li><b>Unbreakable security</b> due to quantum mechanics principles.</li>
+            <li><b>Future-proof</b> against advances in computing power, including quantum computers.</li>
+            <li><b>Secure key distribution</b> through eavesdropping detection.</li>
+            <li>Ability to <b>detect any attempt at intercepting</b> or measuring the quantum states.</li>
+        </ol>
+        <h5 class="bad">Disadvantages of Quantum Cryptography</h5>
+        <ol class="bad">
+            <li><b>Limited range (~ 250 km)</b> for transmitting quantum signals.</li>
+            <li><b>Complex + requires specialized and costly hardware/infrastructure</b> (QKD filters, beam splitters,
+                fiber optic networks).</li>
+            <li><b>Only secures key distribution</b>, not key management or data transmission itself.</li>
+            <li><b>Polarization of light can change</b> even without an eavesdropper, leading to false positives.</li>
+            <li>Criminals can <b>hide their conduct better online</b> when quantum computing goes mainstream.</li>
+        </ol>
+    </section>
+    <section>
+        <h3>17.2 - Show awareness of the Secure Socket Layer (SSL) / Transport Layer Security (TLS)</h3>
+        <h4>Security Protocols</h4>
+        <ul>
+            <li>The security protocols <b>SSL (Secure Sockets Layer)</b> and <b>Transport Layer Security (TLS)</b> are
+                primarily used to ensure <b>secure and authenticated communication</b> between a <i>client and
+                    server</i>.</li>
+            <li>TLS is the <i>more modern version</i> of SSL and is primarily used with the <i><code>https</code>
+                    protocol</i> when accessing websites. This means that data being transmitted across such connections
+                are <b>encrypted using asymmetric public key cryptography</b>.</li>
+            <li>In common use cases of TLS and SSL (such as <i>web browsing, connecting to public servers, etc.</i>)
+                <b>only the server is authenticated, while the client remains unauthenticated</b>. This means that the
+                protocol only authenticates the server's identity to the client, but not the client's identity to the
+                server (i.e. <i>legitimacy of server is the priority</i>)</li>
+        </ul>
+        <figure><img src="a2-theory-security-6.svg" alt="a2-theory-security-6" style="max-width: 500px;">
+            <figcaption>Figure 17.6 - A website with / without <code>TLS</code> encryption and a valid digital
+                certificate</figcaption>
+        </figure>
+        <ul>
+            <li>SSL/TLS is widely used in various applications and protocols, including:<ul>
+                    <li><b>Web Browsing (HTTPS):</b> SSL/TLS is commonly used to secure communication between web
+                        browsers and web servers, enabling secure online transactions, e-commerce, and browsing of
+                        sensitive information.</li>
+                    <li><b>Email Communication (SMTP/POP3/IMAP):</b> SSL/TLS can be used to secure email communications,
+                        protecting the contents of email messages and login credentials.</li>
+                    <li><b>Virtual Private Networks (VPNs):</b> SSL/TLS is often used as part of VPN protocols to create
+                        secure encrypted tunnels for remote access and secure communication over public networks.</li>
+                    <li><b>Internet of Things (IoT) and Cloud:</b> SSL/TLS is increasingly being used to secure
+                        communication in IoT devices and cloud resources, protecting data transmission and preventing
+                        unauthorized access to connected devices.</li>
+                </ul>
+            </li>
+            <li>SSL/TLS serves the following main objectives:<ul>
+                    <li><b>Encryption:</b> Encrypts data transmitted using strong cryptographic algorithms, ensuring
+                        confidentiality by preventing unauthorized access to the communication content.</li>
+                    <li><b>Authentication:</b> Enables the client to verify the server's identity through digital
+                        certificates issued by trusted Certificate Authorities (CAs), preventing man-in-the-middle
+                        attacks and ensuring communication with the intended server.</li>
+                    <li><b>Data Integrity:</b> Guarantees that the transmitted data has not been tampered with or
+                        modified during transit by using <b>message authentication codes (MACs)</b> <i>(aka.
+                            authentication tags)</i> - a hash generated using the <i>shared key</i> to ensure that the
+                        data was not tampered with / altered during transmission and came from the stated sender.</li>
+                    <li><b>Anti-Replay Protection:</b> Includes mechanisms to prevent replay attacks, where an attacker
+                        attempts to gain unauthorized access or disrupt the connection by capturing and retransmitting
+                        previous communications.</li>
+                </ul>
+            </li>
+            <li>SSL/TLS uses <b>public key infrastructure (PKI)</b>, which is a set of protocols, standards and services
+                to allow clients and services to authenticate each other using digital certificates issued by a
+                <i>certificate authority (CA)</i>. The specifics of these protocols and more details about digital
+                certificates are mentioned below.</li>
+        </ul>
+        <h4>Secure Sockets Layer (SSL)</h4>
+        <ul>
+            <li>Secure Sockets Layer (SSL) is a <i>stateful security protocol</i> that:<ol class="sub">
+                    <li><b>fragments data</b>; into manageable size fragments of 2<sup>14</sup> bytes or less.</li>
+                    <li><b>encrypts data</b>; using both <i>symmetric key encryption</i> (during communication) and
+                        <i>asymmetric key encryption</i> (during the handshake process - see below).</li>
+                    <li><b>compresses data</b>; using lossless compression - however, this may make the connection
+                        vulnerable to the <a href="https://en.wikipedia.org/wiki/CRIME">CRIME SSL/TLS attack</a>.</li>
+                    <li><b>authenticates server + verifies the integrity of data</b>; using a <i>digital signature</i>
+                        contained within a <i>digital certificate</i> (see below) and message authentication codes
+                        (MACs).</li>
+                </ol>
+            </li>
+            <li>A client would initially establish connection with a server via SSL using the <b>handshake protocol</b>.
+                The following diagram summarizes this handshake process, based on the <i>TLS 1.2 version</i> (i.e. both
+                SSL and TLS use the same handshake process):</li>
+        </ul>
+        <figure><img src="a2-theory-security-7.svg" alt="a2-theory-security-7" style="max-height: 600px;">
+            <figcaption>Figure 17.7 - TLS 1.2 Handshake Protocol</figcaption>
+        </figure>
+        <ol>
+            <li><b>Client Hello</b>: A message sent by the client to initiate the connection. Contains details such as
+                the <i>protocol version, session ID (a unique identifier to help resume a previous session without
+                    performing the full handshake process again, aiding efficency), cipher suite (the cryptography
+                    algorithms supported by the client), compression method and a random number (used to generate a
+                    <b>session key</b>)</i></li>
+            <li><b>Server Hello</b>: A message similar to the "Client Hello" sent by the server back to the client upon
+                receiving the "Client Hello" that confirms the final cipher suite <i>(for example, RSA, Diffie-Hellman,
+                    etc.)</i>, compression method, etc. that will be used.</li>
+            <li><b>Server Certificate</b>: A digital certificate / certificates sent by the server to the client to
+                authenticate itself. This contain's the <b>server's public key</b> which will be used later (referred to
+                as the <i>subject public key</i> in general)</li>
+            <li><b>Server Hello Done</b>: A message signifying the end of the "Server Hello" and associated messages.
+            </li>
+            <li><b>Client Key Exchange</b>: The client generates a key known as the <b>pre-master key</b> that is
+                encrypted using the <i>server's public key (found in the server certificate)</i>. This key is sent to
+                the server.<ul>
+                    <li>At around the same time, the client would use the <i>server's random number (from Server
+                            Hello)</i>, <i>its own random number (from "Client Hello")</i> and <i>the recently generated
+                            pre-master key</i> to compute the <b>session key <i>(aka. master key)</i></b>. More
+                        information about the exact algorithms used here are described in <a
+                            href="https://datatracker.ietf.org/doc/html/rfc6101">RFC6101, the IETF's original
+                            documentation of SSL v3.0</a>.</li>
+                </ul>
+            </li>
+            <li><b>Change CipherSpec (from Client)</b>: Since the <i>session key</i> has now been generated, messages
+                hereafter will be encrypted using this session key. The CipherSpec message informs the server of this
+                change.</li>
+            <li><b>Client Finished</b>: A message indicating the end of handshake process on the client side. This is
+                the first piece of data to be protected using the shared key via <i>symmetric key cryptography</i>.</li>
+            <li><b>Change CipherSpec (from Server)</b>: The server first <i>decrypts the pre-master key</i> sent by the
+                client in the "Client Key Exchange" stage and uses the same process to compute the <b>session key</b>
+                <i>(since the parameters used to compute this are the same, the secret key generated must be the same as
+                    that of the client).</i> After this, a similar CipherSpec message is sent to the client to indicate
+                that messages hereafter from the server will be encrypted with this session key.</li>
+            <li><b>Server Finished</b>: A message similar to that of "Client Finished" protected using the shared key. A
+                hash is also computed to <i>ensure the integrity of the handshake</i>.</li>
+        </ol>
+        <ul>
+            <li>After this <i>handshake process</i>, the client and server can transmit application data, <b>encrypted
+                    using the session key</b>. Therefore, this process is used as means of <i>initiating an encrypted
+                    communication between two devices; most commonly a client and a server</i>.</li>
+        </ul>
+        <h4>Transport Layer Security (TLS)</h4>
+        <ul>
+            <li>Transport Layer Security (TLS) is a <i>layered security protocol</i> that:<ol class="sub">
+                    <li><b>fragments data</b>; into manageable size fragments of 2<sup>14</sup> bytes or less.</li>
+                    <li><b>encrypts data</b>; using both <i>symmetric key encryption</i> (during communication) and
+                        <i>asymmetric key encryption</i> (during the handshake process - see below).</li>
+                    <li><b>authenticates server + verifies the integrity of data</b>; using a <i>digital signature</i>
+                        contained within a <i>digital certificate</i> (see below) and message authentication codes
+                        (MACs).</li>
+                </ol>
+            </li>
+            <li>TLS involves the use of <b>2 protocols (i.e. layers)</b> found in-between the <i>application and
+                    transport layers</i> of the TCP/IP protocol stack: <b>handshake protocol</b> and <b>record
+                    protocol</b> (top-to-bottom):</li>
+        </ul>
+        <figure><img src="a2-theory-security-8.svg" alt="a2-theory-security-8">
+            <figcaption>Figure 17.8 - TLS Layers in the TCP/IP Stack</figcaption>
+        </figure>
+        <ol>
+            <li><b>Handshake Protocol</b>: Performs a process identical to that of SSL, with support for more secure and
+                up-to-date cipher suites such as <i>Advanced Encryption Standard (AES)</i>, and replaces the now
+                outdated MD5 algorithm - for <i>HMAC (Hash-based Message Authentication Code)</i> - when generating
+                message authentication codes (MACs). This provides <i>more complex cryptography and security.</i></li>
+            <li><b>Record Protocol</b>: Responsible for the actual transmission of data after the handshake process:<ul>
+                    <li><i>On transmission:</i> fragments the data into manageable blocks, optionally compresses the
+                        data, applies a MAC (message authentication code) and encrypts the result.</li>
+                    <li><i>On receipt:</i> blocks are decrypted, verified, decompressed, reassembled, and then delivered
+                        to the application layer.</li>
+                </ul>
+            </li>
+        </ol>
+        <ul>
+            <li>TLS is able to perform <b>session caching:</b>
+                <ol class="sub">
+                    <li>The client sends a ClientHello <i>using the Session ID of the session to be resumed</i>.</li>
+                    <li>The server then <i>checks its session cache</i> for a match.</li>
+                    <li>If a match is found, the <i>connection will be re-established</i>.</li>
+                    <li>If a match is not found, the server generates a new session ID, and the <i>client and server
+                            perform a full handshake.</i></li>
+                </ol>
+            </li>
+            <li>This process makes TLS highly efficient, as recomputing asymmetric key crytography algorithms and
+                <i>re-running the full handshake process</i> is a <b>computationally expensive process.</b></li>
+        </ul>
+    </section>
+    <section>
+        <h3>17.3 - Show understanding of digital certification</h3>
+        <h4>Digital Signatures</h4>
+        <ul>
+            <li>Digital Signatures are electronic way of <b>validating the authenticity of digital documents</b> and
+                also <b>serves as proof that a document was sent by a known user.</b></li>
+            <li>Digital Signatures help uphold the <b>4 core principles</b> of security:<ol class="sub">
+                    <li><b>Confidentiality:</b> Only the intended recipient can read & decipher the data.</li>
+                    <li><b>Integrity:</b> Data should reach the destination without alteration.</li>
+                    <li><b>Authentication:</b> The sender should be confirmed as legitimate and who it claims to be.
+                    </li>
+                    <li><b>Non-Repudiation:</b> Sender nor receiver can deny they were part of the data transmission.
+                    </li>
+                </ol>
+            </li>
+            <li>A digital signature is created through the following process:<ol class="sub">
+                    <li><b>Hash Function</b>
+                        <ol>
+                            <li>The data to be signed (e.g., a document, email, or code) is passed through a
+                                cryptographic hash function, such as SHA-256 or SHA-3.</li>
+                            <li>The hash function produces a fixed-size digest or hash value, which is a unique
+                                representation of the data.</li>
+                            <li>Any change in the original data, even a single bit, will result in a completely
+                                different hash value.</li>
+                        </ol>
+                    </li>
+                    <li><b>Private Key Encryption</b>
+                        <ol>
+                            <li>The hash value obtained from the previous step is encrypted using the signer's private
+                                key, which is part of an asymmetric key pair (public and private keys).</li>
+                            <li>The encryption process is typically performed using an algorithm like RSA or the Digital
+                                Signature Algorithm (DSA).</li>
+                            <li>The encrypted hash value becomes the digital signature.</li>
+                        </ol>
+                    </li>
+                    <li><b>Signature Attachment</b>
+                        <ol>
+                            <li>The digital signature is then attached to the original data, either by appending it to
+                                the data or transmitting it separately but linked to the data.</li>
+                        </ol>
+                    </li>
+                </ol>
+            <li>To verify the digital signature, the following steps are performed:<ol class="sub">
+                    <li><b>Hash Function</b>
+                        <ol>
+                            <li>The recipient applies the same hash function to the received data to obtain a new hash
+                                value.</li>
+                        </ol>
+                    </li>
+                    <li><b>Decryption</b>
+                        <ol>
+                            <li>The recipient uses the signer's public key (corresponding to the private key used for
+                                signing) to decrypt the digital signature, revealing the original hash value.</li>
+                        </ol>
+                    </li>
+                    <li><b>Comparision</b>
+                        <ol>
+                            <li>The recipient compares the decrypted hash value from the digital signature with the
+                                newly calculated hash value from the received data.
+                            <li>If the two hash values match, the digital signature is valid, and the data is considered
+                                authentic and unmodified.</li>
+                            <li>If the hash values do not match, the digital signature is invalid, indicating that the
+                                data has been tampered with or was not signed by the claimed signer.</li>
+                        </ol>
+                    </li>
+                </ol>
+            </li>
+            <li>Digital signatures are widely used in various applications, such as <b>software distribution, digital
+                    contracts, code signing, and secure communications</b></li>
+        </ul>
+        <h4>Digital Certificates</h4>
+        <ul>
+            <li>A digital certificate is an electronic document that <b>binds a public key to an entity's identity, such
+                    as a person, organization, or device.</b></li>
+            <li>It is used in various security protocols, including SSL/TLS, to <i>establish secure communication
+                    channels and authenticate parties involved in the communication.</i></li>
+            <li>A digital certificate typically contains the following information:<ol type="A">
+                    <li><b>Subject</b>: The entity (person, organization, or device) to which the certificate is issued.
+                    </li>
+                    <li><b>Subject's public key</b>: The public key associated with the subject's identity.</li>
+                    <li><b>Issuer</b>: The Certificate Authority (CA) that issued and digitally signed the certificate.
+                    </li>
+                    <li><b>Validity period</b>: The time frame during which the certificate is considered valid.</li>
+                    <li><b>Signature</b>: A digital signature from the issuing CA, which verifies the authenticity and
+                        integrity of the certificate.</li>
+                </ol>
+            </li>
+            <li>To obtain a digital certificate:<ol class="sub">
+                    <li><b>Key Pair Generation</b>: The entity generates a public-private key pair using a cryptographic
+                        algorithm like RSA or Elliptic Curve Cryptography (ECC).</li>
+                    <li><b>Certificate Signing Request (CSR)</b>: The entity creates a Certificate Signing Request
+                        (CSR), which includes the public key and additional information about the entity (such as name,
+                        organization, and location).</li>
+                    <li><b>Submission to a Certificate Authority (CA)</b>: The entity submits the CSR to a trusted
+                        Certificate Authority (CA), along with the required documentation and payment (if applicable).
+                    </li>
+                    <li><b>Verification</b>: The CA verifies the entity's identity and the information provided in the
+                        CSR through various methods, such as document verification, domain validation, or extended
+                        validation processes.</li>
+                    <li><b>Certificate issuance</b>: If the verification is successful, the CA creates a digital
+                        certificate by combining the entity's public key and identity information, along with other
+                        necessary metadata, and digitally signs it with the CA's private key.</li>
+                    <li><b>Certificate delivery</b>: The CA delivers the issued digital certificate to the entity, which
+                        can then be installed on servers, devices, or applications that require secure communication or
+                        authentication.</li>
+                </ol>
+            </li>
+            <li>It's important to note that <b>digital certificates have an expiration date</b>, and they need to be
+                <i>renewed periodically by following a similar process with the issuing CA.</i></li>
+            <li>In order to <b>generate a digital signature using a digital certificate</b>, the following process can
+                be performed:<ol class="sub">
+                    <li><b>Key Generation</b>: The entity (person or organization) generates a pair of cryptographic
+                        keys: a public key and a private key.</li>
+                    <li><b>Certificate Request</b>: The entity sends a request to a trusted Certificate Authority (CA),
+                        including their public key and identity information.</li>
+                    <li><b>Certificate Issuance</b>: The CA verifies the entity's identity and issues a digital
+                        certificate that binds the public key to the entity's identity.</li>
+                    <li><b>Signing Data</b>: To sign data (e.g., a document or email), the entity calculates a hash
+                        (digital fingerprint) of the data. The entity then encrypts this hash using their private key,
+                        creating a digital signature.</li>
+                    <li><b>Signature Verification</b>: To verify the digital signature, the recipient performs the
+                        following steps:<ol>
+                            <li>Calculates the hash of the received data.</li>
+                            <li>Obtains the sender's public key from their digital certificate.</li>
+                            <li>Uses the public key to decrypt the digital signature, revealing the original hash.</li>
+                            <li>Compares the decrypted hash with the calculated hash of the received data.</li>
+                            <li>If the hashes match, the signature is valid, and the data is authentic and unmodified.
+                            </li>
+                        </ol>
+                    </li>
+                </ol>
+            </li>
+        </ul>
+    </section>
+</body>
+
+</html>

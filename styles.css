@@ -1,0 +1,159 @@
+@import url("https://fonts.googleapis.com/css2?family=Arimo:ital,wght@0,400..700;1,400..700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap");
+
+:root {
+  --good-accent: #b1e263;
+  --bad-accent: #ff7b7f;
+}
+
+html,
+body {
+  font-family: "Arimo", sans-serif;
+  line-height: 2rem;
+}
+
+body {
+  width: 100%;
+  margin: 0 auto;
+  box-shadow: 0 0 100rem 0.5rem #ddd;
+  padding-bottom: 1rem;
+}
+
+code {
+  font-family: "Roboto Mono", monospace;
+}
+
+table tr td {
+  vertical-align: top;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+  margin: 1.5rem 1rem;
+  padding: 0.5rem 0;
+  line-height: normal;
+  border-radius: 0.2rem;
+}
+
+h1 {
+  text-align: center;
+  background-color: var(--primary);
+  margin-top: 0;
+  margin-bottom: 0;
+  padding: 1rem;
+}
+
+h2 {
+  text-align: center;
+  margin: 0 1rem;
+  margin-top: -0.1rem;
+  font-weight: lighter;
+  font-size: 1.2rem;
+  background-color: #555;
+  color: #fff;
+}
+
+h3 {
+  color: #555;
+  border-bottom: 2px solid var(--primary);
+  margin-top: 0.5rem;
+}
+
+h4 {
+  padding-left: 1rem;
+  background-color: var(--primary-accent);
+}
+
+h5 {
+  margin-left: 2rem;
+  padding-left: 1rem;
+  font-size: 1rem;
+  background-color: var(--primary-accent);
+}
+
+h5.good {
+  background-color: var(--good-accent);
+}
+
+h5.bad {
+  background-color: var(--bad-accent);
+}
+
+ol {
+  border-left: 5px solid var(--primary-accent);
+  margin: 0 3rem 0 2rem;
+}
+
+ol.good {
+  border-left: 5px solid var(--good-accent);
+}
+
+ol.bad {
+  border-left: 5px solid var(--bad-accent);
+}
+
+ol.sub {
+  border-left: 5px solid var(--secondary);
+}
+
+li {
+  margin: 1rem 0;
+}
+
+section {
+  margin: 1.5rem 1rem;
+  border-left: 2px solid var(--primary);
+}
+
+figure {
+  border: 2px solid #ccc;
+  border-radius: 0.3rem;
+  padding: 1rem;
+  margin: 1rem 2rem;
+  text-align: center;
+}
+
+figure figcaption {
+  color: #555;
+  font-style: italic;
+  margin-top: 1rem;
+  line-height: normal;
+}
+
+figure img {
+  width: 100%;
+  max-height: 500px;
+}
+
+p.license {
+  text-align: center;
+  margin-bottom: 0;
+  color: #555;
+}
+
+p.license img {
+  padding: 0 0.2rem;
+  height: 22px !important;
+  margin-left: 3px;
+  vertical-align: text-bottom;
+}
+
+a {
+  color: #0000ff;
+  text-decoration: none;
+}
+
+@media only screen and (min-width: 1024px) {
+  body {
+    width: 75%;
+  }
+}
+
+@media only screen and (min-width: 1440px) {
+  body {
+    width: 50%;
+  }
+}
