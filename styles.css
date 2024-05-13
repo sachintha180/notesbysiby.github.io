@@ -146,6 +146,10 @@ a {
   text-decoration: none;
 }
 
+div#codeblock {
+  margin: 1rem;
+}
+
 @media only screen and (min-width: 1024px) {
   body {
     width: 75%;
