@@ -1,6 +1,6 @@
 # A2 Computer Science - Practicals
 
-## Complete Notes for Python Programming
+## Complete Notes for Python & Pseudocode
 
 ---
 
@@ -10,7 +10,6 @@
 > - Hence, any algorithms that use **arrays** would have a space complexity of $O(n)$ or greater.
 >
 > *Reference: Cambridge International AS & A Level Computer Science - David Watson, Helen Williams - Page 490*
-> 
 
 > # Checklist
 >
@@ -31,8 +30,8 @@
 >     - [ ] Establish [method overloading](#inheritance) (i.e. methods within a class that have different signatures/prototypes)
 >     - [ ] Establish [method overriding](#inheritance) (i.e. methods within a child class that re-implements those of the parent class)
 >   - [ ] [Instantiate objects of classes](#instantiating-classes) (including child classes) and arrays of objects
-> - [ ] Write algorithms using exception handling (i.e. `try-except` statements)
-> - [ ] Write algorithms using file handling
+> - [ ] Write algorithms using [exception handling](#exception-handling) (i.e. `try-except` statements)
+> - [ ] Write algorithms using [file handling](#file-handling)
 >   - [ ] Read/write data to/from serial/sequential files
 >   - [ ] Read/write data to/from random files
 >   - [ ] Read/write data to/from files into/out of records (i.e. objects)
@@ -64,8 +63,36 @@
 > 
 >     return found
 > 
-> print(linearSearch(5))  # Output: True
-> print(linearSearch(10))  # Output: False
+> print(linearSearch(5))  # OUTPUT: True
+> print(linearSearch(10))  # OUTPUT: False
+> ```
+>
+> ```
+> CONSTANT ARRAY_SIZE = 10
+> 
+> DECLARE items: ARRAY[1:ARRAY_SIZE] OF INTEGER
+> 
+> items <- [5, 4, 3, 6, 2, 7, 8, 1, 9, 0]
+> 
+> FUNCTION linearSearch(BYVAL item: INTEGER) RETURNS BOOLEAN
+>     DECLARE i: INTEGER
+>     DECLARE found: BOOLEAN
+> 
+>     found <- FALSE
+>     i <- 1
+> 
+>     WHILE i <= ARRAY_SIZE AND found = FALSE DO
+>         IF items[i] = item THEN
+>             found <- TRUE
+>         ENDIF
+>         i <- i + 1
+>     ENDWHILE
+> 
+>     RETURN found
+> ENDFUNCTION
+> 
+> OUTPUT linearSearch(5)  // OUTPUT: TRUE
+> OUTPUT linearSearch(10)  // OUTPUT: FALSE
 > ```
 
 > #### Binary Search
@@ -82,13 +109,15 @@
 >
 > **Iterative Implementation**
 >
+> - Note that **right** is initialized as `len(items)-1` - because the **upper bound of a Python 0-indexed array** is it's length - 1.
+>
 > ```python
 > items = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]  # items: ARRAY OF INTEGER
 > 
 > def binarySearch(item):  # item: INTEGER
 >     found = False  # found: BOOLEAN
 >     left = 0  # left: INTEGER
->     right = len(items)  # right: INTEGER
+>     right = len(items) - 1  # right: INTEGER
 > 
 >     while left <= right and found == False:
 >         mid = (left + right) // 2  # mid: INTEGER
@@ -101,8 +130,46 @@
 > 
 >     return found
 > 
-> print(binarySearch(5))  # Output: True
-> print(binarySearch(10))  # Output: False
+> 
+> print(binarySearch(5))  # OUTPUT: True
+> print(binarySearch(10))  # OUTPUT: False
+> ```
+>
+> ```
+> CONSTANT ARRAY_SIZE = 10
+> 
+> DECLARE items: ARRAY[1:ARRAY_SIZE] OF INTEGER
+> 
+> items <- [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+> 
+> FUNCTION binarySearch(BYVAL item: INTEGER) RETURNS BOOLEAN
+>     DECLARE mid: INTEGER
+>     DECLARE left: INTEGER
+>     DECLARE right: INTEGER
+>     DECLARE found: BOOLEAN
+> 
+>     found <- FALSE
+>     left <- 1
+>     right <- ARRAY_SIZE
+> 
+>     WHILE left <= right AND found = FALSE DO
+>          mid <- (left + right) DIV 2
+>          IF items[mid] = item THEN
+>              found <- TRUE
+>          ELSE
+>              IF item > items[mid] THEN
+>                  left <- mid + 1
+>              ELSE
+>                  right <- mid - 1
+>              ENDIF
+>          ENDIF
+>     ENDWHILE
+> 
+>     RETURN found
+> ENDFUNCTION
+> 
+> OUTPUT binarySearch(5)  // OUTPUT: TRUE
+> OUTPUT binarySearch(10)  // OUTPUT: FALSE
 > ```
 >
 > **Recursive Implementation**
@@ -122,10 +189,43 @@
 >     else:
 >         return binarySearch(array[:m], item)
 > 
-> print(binarySearch(items, 5))  # Output: True
-> print(binarySearch(items, 10))  # Output: False
+> print(binarySearch(items, 5))  # OUTPUT: True
+> print(binarySearch(items, 10))  # OUTPUT: False
 > ```
 >
+> - The pseudocode implementation for **recursive binary search** is slightly different since *splitting the array into two halves* isn't straightforward like Python's slicing syntax. 
+> - Hence, the **left and right indices** are also passed in as parameters (excluding the array, which is treated as a global variable) - this reduces this implementation's space complexity to $O(n)$:
+>
+> ```
+> CONSTANT ARRAY_SIZE = 10
+> 
+> DECLARE items: ARRAY[1:ARRAY_SIZE] OF INTEGER
+> 
+> items <- [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+> 
+> FUNCTION binarySearch(BYVAL item: INTEGER, BYVAL left: INTEGER, BYVAL right: INTEGER) RETURNS BOOLEAN
+>     DECLARE m: INTEGER
+> 
+>     IF left > right THEN
+>         RETURN FALSE
+>     ENDIF
+> 
+>     m <- (left + right) DIV 2
+> 
+>     IF item = items[m] THEN
+>         RETURN TRUE
+>     ELSE
+>         IF item > items[m] THEN
+>             RETURN binarySearch(item, m + 1, right)
+>         ELSE
+>             RETURN binarySearch(item, left, m - 1)
+>         ENDIF
+>     ENDIF
+> ENDFUNCTION
+> 
+> OUTPUT binarySearch(5, 1, ARRAY_SIZE)  // OUTPUT: TRUE
+> OUTPUT binarySearch(10, 1, ARRAY_SIZE)  // OUTPUT: FALSE
+> ```
 
 ### Sorting Algorithms
 
@@ -150,19 +250,54 @@
 >     swapped = True  # swapped: BOOLEAN
 >     # (1) outer loop for every "pass"
 >     #     ... if nothing was swapped by the end of a pass, the array is already sorted
->     while i < len(array) - 1 and swapped:
+>     while i < len(items) - 1 and swapped:
 >         swapped = False
 >         # (2) inner loop for every "comparision"
->         for j in range(len(array)-i-1):  # j: INTEGER
+>         for j in range(len(items)-i-1):  # j: INTEGER
 >              # (3) check if the current item is greater than the next item
->             if array[j] > array[j+1]:
+>             if items[j] > items[j+1]:
 >                 # (4) if true, swap the items
->                 array[j], array[j+1] = array[j+1], array[j]
+>                 items[j], items[j+1] = items[j+1], items[j]
 >                 swapped = True
 >         i += 1
->         
+> 
 > bubbleSort()
-> print(items)  # Output: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+> print(items)  # OUTPUT: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+> ```
+>
+> - The pseudocode implementation of bubble sort uses a **0-indexed** array - therefore, `while i < len(items) - 1` becomes `WHILE i < ARRAY_SIZE` - the `-1` is removed:
+> ```
+> CONSTANT ARRAY_SIZE = 10
+> 
+> DECLARE items: ARRAY[1:ARRAY_SIZE] OF INTEGER
+> 
+> items <- [1, 5, 7, 6, 4, 3, 8, 9, 2, 0]
+> 
+> PROCEDURE bubbleSort()
+>     DECLARE i: INTEGER
+>     DECLARE j: INTEGER
+>     DECLARE temp: INTEGER
+>     DECLARE swapped: BOOLEAN
+> 
+>     i <- 1
+>     swapped <- TRUE
+>     
+>     WHILE i < ARRAY_SIZE AND swapped = TRUE DO
+>         swapped <- FALSE
+>         FOR j <- 1 TO (ARRAY_SIZE - i - 1)
+>             IF items[j] > items[j + 1] THEN
+>                 temp <- items[j]
+>                 items[j] <- items[j + 1]
+>                 items[j + 1] <- temp
+>                 swapped <- TRUE
+>             ENDIF
+>         NEXT j
+>         i <- i + 1
+>     ENDWHILE
+> ENDPROCEDURE
+> 
+> CALL bubbleSort()
+> OUTPUT items  // OUTPUT: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 > ```
 
 > #### Insertion Sort
@@ -189,9 +324,36 @@
 >             j -= 1
 >         # (3) insert item into the determined location in the sorted part
 >         items[j + 1] = value
->         
+> 
 > insertionSort()
-> print(items)  # Output: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+> print(items)  # OUTPUT: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+> ```
+>
+> ```
+> CONSTANT ARRAY_SIZE = 10
+> 
+> DECLARE items: ARRAY[1:ARRAY_SIZE] OF INTEGER
+> 
+> items <- [1, 5, 7, 6, 4, 3, 8, 9, 2, 0]
+> 
+> PROCEDURE insertionSort()
+>     DECLARE i: INTEGER
+>     DECLARE j: INTEGER
+>     DECLARE value: INTEGER
+> 
+>     FOR i <- 2 TO ARRAY_SIZE
+>         value <- items[i]
+>         j <- i - 1
+>         WHILE j >= 1 AND value < items[j] DO
+>             items[j + 1] <- items[j]
+>             j <- j - 1
+>         ENDWHILE
+>         items[j + 1] <- value
+>     NEXT i
+> ENDPROCEDURE
+> 
+> CALL insertionSort()
+> OUTPUT items  // OUTPUT: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 > ```
 
 ### User Defined Data Types
@@ -204,11 +366,19 @@
 > ```python
 > from datetime import date
 > 
-> class Student
-> 	def __init__(self):
+> class Student:
+>     def __init__(self):
 >         self.name = ""  # STRING
 >         self.dob = date.today()  # DATE
 >         self.mark = 0  # INTEGER
+> ```
+>
+> ```
+> TYPE Student
+> 	DECLARE name: STRING
+> 	DECLARE dob: DATE
+> 	DECLARE mark: INTEGER
+> ENDTYPE
 > ```
 >
 > - An **array of records** can be initialized as follows:
@@ -218,16 +388,30 @@
 > Students = [Student() for i in range(ARRAY_SIZE)]
 > ```
 >
+> ```
+> CONSTANT ARRAY_SIZE = 10
+> DECLARE Students: ARRAY[1:ARRAY_SIZE] OF Student
+> ```
+>
 > - Following the initialization of the array, it can be **traversed and output using the following syntax**:
 >
 > ```python
 > for student in Students:
 >     print(f"Student Name: {student.name} | Student DOB: {student.dob} | Student Mark: {student.mark}")
->     
+> 
 > # OUTPUT (assuming Students was given values):
 > # Student Name: Bob | Student DOB: 05-06-2003 | Student Mark: 89
 > # Student Name: Alice | Student DOB: 02-11-2003 | Student Mark: 75
 > # ...
+> ```
+>
+> ```
+> DECLARE i: INTEGER
+> 
+> FOR i <- 1 TO ARRAY_SIZE
+>     OUTPUT "Student Name: ", Students[i].name, " | Student DOB: ", Students[i].dob, " | Student Mark: ", 
+>             Students[i].mark
+> NEXT i
 > ```
 
 ### Abstract Data Types (ADTs)
@@ -243,10 +427,23 @@
 > **Initialization** (Main Program)
 >
 > ```python
-> stackful = 5  # stackful: INTEGER
-> stack = [None for i in range(stackful)]  # stack: ARRAY OF INTEGER
+> STACKFUL = 5  # CONSTANT
+> stack = [None for i in range(STACKFUL)]  # stack: ARRAY OF INTEGER
 > topPointer = -1  # topPointer: INTEGER
 > basePointer = 0  # basePointer: INTEGER
+> ```
+>
+> - Note that **topPointer** and **basePointer** are initialized with a starting value **1 more than that of Python** - this is because of pseudocode arrays being **1-indexed.** 
+> - The same principles apply to the pseudocode-respective implementations of `push()` and `pop()` as well:
+>
+> ```
+> CONSTANT STACKFUL = 5
+> DECLARE stack: ARRAY[1:STACKFUL] OF INTEGER
+> DECLARE topPointer: INTEGER
+> DECLARE basePointer: INTEGER
+> 
+> topPointer <- 0
+> basePointer <- 1
 > ```
 >
 > **`push()` Procedure**
@@ -254,11 +451,22 @@
 > ```python
 > def push(item):
 >     global stack, topPointer
->     if topPointer == stackful - 1:
+>     if topPointer == STACKFUL - 1:
 >         print("The stack is full.")
 >     else:
 >         topPointer += 1
 >         stack[topPointer] = item
+> ```
+>
+> ```
+> PROCEDURE push(BYVAL item: INTEGER)
+>     IF topPointer = STACKFUL THEN
+>         OUTPUT "The stack is full."
+>     ELSE
+>         topPointer <- topPointer + 1
+>         stack[topPointer] <- item
+>     ENDIF
+> ENDPROCEDURE
 > ```
 >
 > **`pop()` Function**
@@ -274,6 +482,21 @@
 >         stack[topPointer] = None
 >         topPointer -= 1
 >     return item
+> ```
+>
+> ```
+> FUNCTION pop() RETURNS INTEGER
+>     DECLARE item: INTEGER
+>     item <- -1 // NULL
+>     IF topPointer = basePointer - 1 THEN
+>         OUTPUT "The stack is empty."
+>     ELSE
+>         item <- stack[topPointer]
+>         stack[topPointer] <- -1 // NULL
+>         topPointer <- topPointer - 1
+>     ENDIF
+>     RETURN item
+> ENDFUNCTION
 > ```
 >
 > **Example Main Program**
@@ -301,6 +524,31 @@
 > print("Top Pointer:", topPointer)  # OUTPUT: Top Pointer: 0
 > print("Base Pointer:", basePointer)  # OUTPUT: Base Pointer: 0
 > ```
+>
+> ```
+> CALL push(10)
+> CALL push(15)
+> CALL push(19)
+> CALL push(14)
+> 
+> DECLARE item: INTEGER
+> item <- pop()
+> OUTPUT item
+> 
+> CALL push(25)
+> CALL push(15)
+> CALL push(26)
+> 
+> pop()
+> pop()
+> pop()
+> item <- pop()
+> OUTPUT item
+> 
+> OUTPUT stack
+> OUTPUT "Top Pointer: ", topPointer
+> OUTPUT "Base Pointer: ", basePointer
+> ```
 
 > #### Linear Queue
 >
@@ -312,22 +560,46 @@
 > **Initialization**
 >
 > ```python
-> queueFul = 5  # queueFul: INTEGER
-> queue = [None for i in range(queueFul)]  # queue: ARRAY OF INTEGER
+> QUEUEFUL = 5  # CONSTANT
+> queue = [None for i in range(QUEUEFUL)]  # queue: ARRAY OF INTEGER
 > rearPointer = -1  # rearPointer: INTEGER
 > frontPointer = 0  # frontPointer: INTEGER
 > ```
+>
+> ```
+> CONSTANT QUEUEFUL = 5
+> DECLARE queue: ARRAY[1:QUEUEFUL] OF INTEGER
+> DECLARE rearPointer: INTEGER
+> DECLARE frontPointer: INTEGER
+> 
+> rearPointer <- 0
+> frontPointer <- 1
+> ```
+>
+> - Note that **rearPointer** and **frontPointer** are initialized with a starting value **1 more than that of Python** - this is because of pseudocode arrays being **1-indexed.** 
+> - The same principles apply to the pseudocode-respective implementations of `enqueue()` and `dequeue()` as well:
 >
 > **`enqueue()` Procedure**
 >
 > ```python
 > def enqueue(item):
 >     global queue, rearPointer
->     if rearPointer == queueFul - 1:
+>     if rearPointer == QUEUEFUL - 1:
 >         print("The queue is full.")
 >     else:
 >         rearPointer += 1
 >         queue[rearPointer] = item
+> ```
+>
+> ```
+> PROCEDURE enqueue(BYVAL item: INTEGER)
+>     IF rearPointer = QUEUEFUL THEN
+>         OUTPUT "The queue is full."
+>     ELSE
+>         rearPointer <- rearPointer + 1
+>         queue[rearPointer] <- item
+>     ENDIF
+> ENDPROCEDURE
 > ```
 >
 > **`dequeue()` Function**
@@ -336,7 +608,7 @@
 > def dequeue():
 >     global queue, frontPointer
 >     item = None  # item: INTEGER
->     if frontPointer == queueFul:
+>     if frontPointer == QUEUEFUL:
 >         print("The queue is empty.")
 >     else:
 >         item = queue[frontPointer]
@@ -344,9 +616,24 @@
 >         frontPointer += 1
 >     return item
 > ```
-> 
+>
+> ```
+> FUNCTION dequeue() RETURNS INTEGER
+>     DECLARE item: INTEGER
+>     item <- -1 // NULL
+>     IF frontPointer > QUEUEFUL THEN
+>         OUTPUT "The queue is empty."
+>     ELSE
+>         item <- queue[frontPointer]
+>         queue[frontPointer] <- -1 // NULL
+>         frontPointer <- frontPointer + 1
+>     ENDIF
+>     RETURN item
+> ENDFUNCTION
+> ```
+>
 > - However the issue with a linear queue is that **when the `frontPointer` reaches the rear of the queue** (i.e. `queueFul`) - even when there's **space remaining at the front of the queue** - the locations at the front of the queue become unreachable. 
-> 
+>
 > **Example Main Program**
 >
 > ```python
@@ -371,6 +658,30 @@
 > print("Rear Pointer:", rearPointer)  # OUTPUT: Rear Pointer: 4
 > print("Front Pointer:", frontPointer)  # OUTPUT: Front Pointer: 4
 > ```
+>
+> ```
+> CALL enqueue(10)
+> CALL enqueue(15)
+> CALL enqueue(19)
+> CALL enqueue(14)
+> 
+> DECLARE item: INTEGER
+> item <- dequeue()
+> OUTPUT item
+> 
+> CALL enqueue(25)
+> CALL enqueue(15)
+> CALL enqueue(26)
+> 
+> CALL dequeue()
+> CALL dequeue()
+> item <- dequeue()
+> OUTPUT item
+> 
+> OUTPUT queue
+> OUTPUT "Rear Pointer: ", rearPointer
+> OUTPUT "Front Pointer: ", frontPointer
+> ```
 
 > #### Circular Queue
 >
@@ -385,6 +696,18 @@
 > queue = [None for i in range(queueFul)]  # queue: ARRAY OF INTEGER
 > rearPointer = -1  # rearPointer: INTEGER
 > frontPointer = 0  # frontPointer: INTEGER
+> ```
+>
+> ```
+> CONSTANT QUEUEFUL = 5
+> DECLARE queueLength: INTEGER
+> DECLARE queue: ARRAY[1:QUEUEFUL] OF INTEGER
+> DECLARE rearPointer: INTEGER
+> DECLARE frontPointer: INTEGER
+> 
+> queueLength <- 0
+> rearPointer <- 0
+> frontPointer <- 1
 > ```
 >
 > **`enqueue()` Procedure**
@@ -405,6 +728,22 @@
 >         queue[rearPointer] = item
 >         # (4) increment queue length
 >         queueLength += 1
+> ```
+>
+> ```
+> PROCEDURE enqueue(BYVAL item: INTEGER)
+>     IF queueLength = QUEUEFUL THEN
+>         OUTPUT "The queue is full."
+>     ELSE
+>         IF rearPointer = QUEUEFUL THEN
+>             rearPointer <- 1
+>         ELSE
+>             rearPointer <- rearPointer + 1
+>         ENDIF
+>         queue[rearPointer] <- item
+>         queueLength <- queueLength + 1
+>     ENDIF
+> ENDPROCEDURE
 > ```
 >
 > **dequeue() Function**
@@ -430,6 +769,28 @@
 >     return item
 > ```
 >
+> ```
+> FUNCTION dequeue() RETURNS INTEGER
+>     DECLARE item: INTEGER
+>     item <- -1 // NULL
+> 
+>     IF queueLength = 0 THEN
+>         OUTPUT "The queue is empty."
+>     ELSE
+>         item <- queue[frontPointer]
+>         queue[frontPointer] <- -1 // NULL
+>         IF frontPointer > QUEUEFUL THEN
+>             frontPointer <- 1
+>         ELSE
+>             frontPointer <- frontPointer + 1
+>         ENDIF
+>         queueLength <- queueLength - 1
+>     ENDIF
+> 
+>     RETURN item
+> ENDFUNCTION
+> ```
+>
 > **Example Main Program**
 >
 > ```python
@@ -453,6 +814,30 @@
 > print(queue)  # OUTPUT: [15, None, None, None, 25]
 > print("Rear Pointer:", rearPointer)  # OUTPUT: Rear Pointer: 0
 > print("Front Pointer:", frontPointer)  # OUTPUT: Front Pointer: 4
+> ```
+>
+> ```
+> CALL enqueue(10)
+> CALL enqueue(15)
+> CALL enqueue(19)
+> CALL enqueue(14)
+> 
+> DECLARE item: INTEGER
+> item <- dequeue()
+> OUTPUT item
+> 
+> CALL enqueue(25)
+> CALL enqueue(15)
+> CALL enqueue(26)
+> 
+> CALL dequeue()
+> CALL dequeue()
+> item <- dequeue()
+> OUTPUT item
+> 
+> OUTPUT queue
+> OUTPUT "Rear Pointer:", rearPointer
+> OUTPUT "Front Pointer:", frontPointer
 > ```
 
 > #### Linked List
@@ -492,6 +877,20 @@
 > heapPointer = NULL_POINTER  # heapPointer: INTEGER
 > ```
 >
+> ```
+> TYPE Node
+>     DECLARE item: INTEGER
+>     DECLARE pointer: INTEGER
+> ENDTYPE
+> 
+> CONSTANT LIST_SIZE = 5
+> CONSTANT NULL_POINTER = -1
+> 
+> DECLARE linkedList: ARRAY[1:LIST_SIZE] OF Node
+> DECLARE startPointer: INTEGER
+> DECLARE heapPointer: INTEGER
+> ```
+>
 > **`tabulate()`Helper  Procedure**
 >
 > ```python
@@ -501,6 +900,18 @@
 >         print(f"{i}\t{linkedList[i].item}\t{linkedList[i].pointer}")
 >     print("Start Pointer:", startPointer)
 >     print("Heap Pointer:", heapPointer)
+> ```
+>
+> ```
+> PROCEDURE tabulate()
+>     DECLARE i: INTEGER
+>     OUTPUT "INDEX\tITEM\tPOINTER"
+>     FOR i <- 1 TO LIST_SIZE
+>         OUTPUT i, " \t ", linkedList[i].item, " \t ", linkedList[i].pointer
+>     NEXT i
+>     OUTPUT "Start Pointer: ", startPointer
+>     OUTPUT "Heap Pointer: ", heapPointer
+> ENDPROCEDURE
 > ```
 >
 > **`initialize()` Procedure**
@@ -518,6 +929,19 @@
 >         linkedList[i].pointer = i + 1
 >     # (4) set the last node's pointer to null (to indicate the end of the list)
 >     linkedList[LIST_SIZE - 1].pointer = NULL_POINTER
+> ```
+>
+> ```
+> PROCEDURE initialize()
+>     DECLARE i: INTEGER
+>     startPointer <- NULL_POINTER
+>     heapPointer <- 1
+>     FOR i <- 1 TO LIST_SIZE
+>         linkedList[i].item <- 0
+>         linkedList[i].pointer <- i + 1
+>     NEXT i
+>     linkedList[LIST_SIZE].pointer <- NULL_POINTER
+> ENDPROCEDURE
 > ```
 >
 > **`insert()` Procedure**
@@ -539,6 +963,21 @@
 >         # (5) set the heapPointer to the temporarily saved pointer to the free node
 >         #     (set the heapPointer to the index of the node after the free node)
 >         heapPointer = tempPointer
+> ```
+>
+> ```
+> PROCEDURE insert(BYVAL value: INTEGER)
+>     DECLARE tempPointer: INTEGER
+>     IF heapPointer = NULL_POINTER THEN
+>         OUTPUT "Cannot insert, linked list is full."
+>     ELSE
+>         tempPointer <- linkedList[heapPointer].pointer
+>         linkedList[heapPointer].item <- value
+>         linkedList[heapPointer].pointer <- startPointer
+>         startPointer <- heapPointer
+>         heapPointer <- tempPointer
+>     ENDIF
+> ENDPROCEDURE
 > ```
 >
 > **`findPrevious()` Helper Function**
@@ -569,6 +1008,32 @@
 >   - **`-2`**: represents that the item to delete is that at the **head** (i.e. start of the linked list)
 >   - **`-1`**: represents that the item to delete is **not found**.
 >   - **`0 ... n`**: item was **found**, and the index of the node previous to it is returned.
+>
+> ```
+> FUNCTION findPrevious(BYVAL value: INTEGER) RETURNS INTEGER
+>     DECLARE currentPointer: INTEGER
+>     DECLARE prevPointer: INTEGER
+>     DECLARE found: BOOLEAN
+>     prevPointer <- NULL_POINTER - 1
+>     currentPointer <- startPointer
+>     found <- FALSE
+>     WHILE currentPointer <> NULL_POINTER AND found = FALSE DO
+>         IF linkedList[currentPointer].item = value THEN
+>             found <- TRUE
+>         ELSE
+>             prevPointer <- currentPointer
+>             currentPointer <- linkedList[currentPointer].pointer
+>         ENDIF
+>     ENDWHILE
+>     IF found = FALSE THEN
+>         prevPointer <- NULL_POINTER
+>     ENDIF
+>     // [prevPointer = NULL_POINTER - 1]  if item is at head
+>     // [prevPointer = NULL_POINTER]      if item not found
+>     // [prevPointer = index]             if item found
+>     RETURN prevPointer
+> ENDFUNCTION
+> ```
 >
 > **`delete()` Procedure**
 >
@@ -604,6 +1069,32 @@
 > - In addition,  you cannot `find()` items after `delete()`-ing them (since the connections to those nodes are lost)
 > - This can be prevented by using an additional array to keep track of those deleted locations, but is not implemented since it is **out of the syllabus' scope.**
 >
+> ```
+> PROCEDURE delete(BYVAL value: INTEGER)
+>     DECLARE prevPointer: INTEGER
+>     DECLARE currentPointer: INTEGER
+>     prevPointer <- findPrevious(value)
+>     IF startPointer = NULL_POINTER THEN
+>         OUTPUT "Cannot delete, linked list is empty."
+>     ELSE
+>         IF prevPointer = NULL_POINTER THEN
+>             OUTPUT "Cannot delete, item doesn't exist."
+>         ELSE
+>             IF prevPointer = NULL_POINTER - 1 THEN
+>                 currentPointer <- startPointer
+>                 startPointer <- linkedList[currentPointer].pointer
+>             ELSE
+>                 currentPointer <- linkedList[prevPointer].pointer
+>                 linkedList[prevPointer].pointer <- linkedList[currentPointer].pointer
+>             ENDIF
+>             linkedList[currentPointer].item <- 0
+>             linkedList[currentPointer].pointer <- NULL_POINTER
+>             heapPointer <- currentPointer
+>         ENDIF
+>     ENDIF
+> ENDPROCEDURE
+> ```
+>
 > **`find()` Function**
 >
 > ```python
@@ -620,6 +1111,23 @@
 >             currentPointer = linkedList[currentPointer].pointer
 >     # (4) if found, return
 >     return found
+> ```
+>
+> ```
+> FUNCTION find(BYVAL value: INTEGER) RETURNS BOOLEAN
+>     DECLARE currentPointer: INTEGER
+>     DECLARE found: BOOLEAN
+>     currentPointer <- startPointer
+>     found <- FALSE
+>     WHILE currentPointer <> NULL_POINTER AND found = FALSE DO
+>         IF linkedList[currentPointer].item = value THEN
+>             found <- TRUE
+>         ELSE
+>             currentPointer <- linkedList[currentPointer].pointer
+>         ENDIF
+>     ENDWHILE
+>     RETURN found
+> ENDFUNCTION
 > ```
 >
 > **Example Main Program**
@@ -671,6 +1179,27 @@
 > # Start Pointer: 4
 > # Heap Pointer: 1
 > ```
+>
+> ```
+> CALL initialize()
+> CALL tabulate()
+> 
+> CALL insert(50)
+> CALL insert(20)
+> CALL insert(10)
+> CALL insert(80)
+> CALL insert(70)
+> CALL insert(40)
+> CALL tabulate()
+> 
+> OUTPUT find(20)
+> OUTPUT find(100)
+> 
+> CALL delete(50)
+> CALL delete(10)
+> CALL delete(20)
+> CALL delete(60)
+> CALL tabulate()
 
 > #### Binary Tree (Array-Based)
 >
@@ -707,10 +1236,36 @@
 > NULL_POINTER = -1  # CONSTANT
 > 
 > binaryTree = [Node(None, NULL_POINTER, NULL_POINTER) for i in range(TREE_SIZE)]  # binaryTree: ARRAY OF Node
-> rootPointer = -1  # rootPointer: INTEGER
+> rootPointer = NULL_POINTER  # rootPointer: INTEGER
 > freePointer = 0  # freePointer: INTEGER
 > ```
+>
+> - The **list comprehension** method used above for initializing the binary tree is not available in pseudocode - instead a generic **index-based for-loop** can be used:
+>
+> ```
+> TYPE Node
+>     DECLARE item: INTEGER
+>     DECLARE leftPointer: INTEGER
+>     DECLARE rightPointer: INTEGER
+> ENDTYPE
 > 
+> CONSTANT TREE_SIZE = 5
+> CONSTANT NULL_POINTER = -1
+> 
+> DECLARE binaryTree: ARRAY[1:TREE_SIZE] OF Node
+> DECLARE rootPointer: INTEGER
+> DECLARE freePointer: INTEGER
+> 
+> rootPointer <- NULL_POINTER
+> freePointer <- 1
+> 
+> FOR i <- 1 TO TREE_SIZE
+>     binaryTree[i].item <- NULL_POINTER
+>     binaryTree[i].leftPointer <- NULL_POINTER
+>     binaryTree[i].rightPointer <- NULL_POINTER
+> NEXT i
+> ```
+>
 > **`tabulate()`Helper  Procedure**
 >
 > ```python
@@ -720,6 +1275,17 @@
 >         print(f"{i}\t{binaryTree[i].item}\t{binaryTree[i].leftPointer}\t{binaryTree[i].rightPointer}")
 >     print("Root Pointer:", rootPointer)
 >     print("Free Pointer:", freePointer)
+> ```
+>
+> ```
+> PROCEDURE tabulate()
+>     OUTPUT "INDEX\tITEM\tLEFT\tRIGHT"
+>     FOR i <- 1 TO TREE_SIZE
+>         OUTPUT i, " \t ", binaryTree[i].item, " \t ", binaryTree[i].leftPointer, " \t ", binaryTree[i].rightPointer
+>     NEXT i
+>     OUTPUT "Root Pointer: ", rootPointer
+>     OUTPUT "Free Pointer: ", freePointer
+> ENDPROCEDURE
 > ```
 >
 > **`add()` Procedure**
@@ -769,6 +1335,48 @@
 >     freePointer += 1
 > ```
 >
+> ```
+> PROCEDURE add(BYVAL item: INTEGER)
+>     DECLARE previousPointer: INTEGER
+>     DECLARE currentPointer: INTEGER
+>     DECLARE addToLeft: BOOLEAN
+> 
+>     IF rootPointer = NULL_POINTER THEN
+>         rootPointer <- 1
+>         binaryTree[rootPointer].item <- item
+>     ELSE
+>         IF freePointer > TREE_SIZE THEN
+>             OUTPUT "Cannot add, binary tree is full."
+>         ELSE
+>             previousPointer <- NULL_POINTER
+>             currentPointer <- rootPointer
+>             addToLeft <- FALSE
+> 
+>             WHILE currentPointer <> NULL_POINTER DO
+>                 previousPointer <- currentPointer
+>                 IF item < (binaryTree[currentPointer].item) THEN
+>                     currentPointer <- (binaryTree[currentPointer].leftPointer)
+>                     addToLeft <- TRUE
+>                 ELSE
+>                     currentPointer <- (binaryTree[currentPointer].rightPointer)
+>                     addToLeft <- FALSE
+>                 ENDIF
+>             ENDWHILE
+> 
+>             binaryTree[freePointer].item <- item
+> 
+>             IF addToLeft = TRUE THEN
+>                 binaryTree[previousPointer].leftPointer <- freePointer
+>             ELSE
+>                 binaryTree[previousPointer].rightPointer <- freePointer
+>             ENDIF
+> 
+>             freePointer <- freePointer + 1
+>         ENDIF
+>     ENDIF
+> ENDPROCEDURE
+> ```
+>
 > **`find()` Function** (Recursive)
 >
 > ```python
@@ -790,6 +1398,24 @@
 >         return find(binaryTree[currentPointer].rightPointer, searchItem)
 > ```
 >
+> ```
+> FUNCTION find(BYVAL currentPointer: INTEGER, BYVAL searchItem: INTEGER) RETURNS BOOLEAN
+>     IF currentPointer = NULL_POINTER THEN
+>         RETURN FALSE
+>     ENDIF
+> 
+>     IF binaryTree[currentPointer].item = searchItem THEN
+>         RETURN TRUE
+>     ELSE
+>         IF searchItem < binaryTree[currentPointer].item THEN
+>             RETURN find(binaryTree[currentPointer].leftPointer, searchItem)
+>         ELSE
+>             RETURN find(binaryTree[currentPointer].rightPointer, searchItem)
+>         ENDIF
+>     ENDIF
+> ENDFUNCTION
+> ```
+>
 > **`traverse()` Functions** - `preOrder()`, `inOrder()`, `postOrder()` (Recursive)
 >
 > > **`preOrder()` Procedure**
@@ -799,7 +1425,7 @@
 > >   $Root \rightarrow Left \rightarrow Right$
 > >
 > > ```python
-> >def preOrder(currentPointer):
+> > def preOrder(currentPointer):
 > >     # (1) return if currentPointer is null (i.e. -1)
 > >     if currentPointer == NULL_POINTER:
 > >         return
@@ -808,12 +1434,22 @@
 > >     print(binaryTree[currentPointer].item, end=" ")
 > > 
 > >     # (3) fully traverse left branch (i.e. until null pointer is reached)
-> >         preOrder(binaryTree[currentPointer].leftPointer)
+> >     preOrder(binaryTree[currentPointer].leftPointer)
 > > 
 > >     # (4) fully traverse right branch (i.e. until null pointer is reached)
 > >     preOrder(binaryTree[currentPointer].rightPointer)
 > > ```
-> > 
+> >
+> > ```
+> > PROCEDURE preOrder(BYVAL currentPointer: INTEGER)
+> >     IF currentPointer <> NULL_POINTER THEN
+> >         OUTPUT binaryTree[currentPointer].item, " "
+> >         CALL preOrder(binaryTree[currentPointer].leftPointer)
+> >         CALL preOrder(binaryTree[currentPointer].rightPointer)
+> >     ENDIF
+> > ENDPROCEDURE
+> > ```
+> >
 > > **`inOrder()` Procedure**
 > >
 > > - Traverses the left branch, outputs the root node's item, and then traverses the right branch.
@@ -823,7 +1459,7 @@
 > > - The items will output **in ascending order**.
 > >
 > > ```python
-> >def inOrder(currentPointer):
+> > def inOrder(currentPointer):
 > >     # (1) return if currentPointer is null (i.e. -1)
 > >     if currentPointer == NULL_POINTER:
 > >         return
@@ -832,12 +1468,22 @@
 > >     inOrder(binaryTree[currentPointer].leftPointer)
 > > 
 > >     # (3) output root node's item (in one-line)
-> >         print(binaryTree[currentPointer].item, end=" ")
+> >     print(binaryTree[currentPointer].item, end=" ")
 > > 
 > >     # (4) fully traverse right branch (i.e. until null pointer is reached)
-> >         inOrder(binaryTree[currentPointer].rightPointer)
+> >     inOrder(binaryTree[currentPointer].rightPointer)
 > > ```
-> > 
+> >
+> > ```
+> > PROCEDURE inOrder(BYVAL currentPointer: INTEGER)
+> >     IF currentPointer <> NULL_POINTER THEN
+> >         CALL inOrder(binaryTree[currentPointer].leftPointer)
+> >         OUTPUT binaryTree[currentPointer].item, " "
+> >         CALL inOrder(binaryTree[currentPointer].rightPointer)
+> >     ENDIF
+> > ENDPROCEDURE
+> > ```
+> >
 > > **`postOrder()` Procedure**
 > >
 > > - Traverses the left branch, the right branch and then outputs the root node's item
@@ -845,9 +1491,9 @@
 > >   $Left \rightarrow Right \rightarrow Root$
 > >
 > > ```python
-> >def postOrder(currentPointer):
+> > def postOrder(currentPointer):
 > >     # (1) return if currentPointer is null (i.e. -1)
-> >    if currentPointer == NULL_POINTER:
+> >     if currentPointer == NULL_POINTER:
 > >         return
 > > 
 > >     # (2) fully traverse left branch (i.e. until null pointer is reached)
@@ -856,16 +1502,26 @@
 > >     # (3) fully traverse right branch (i.e. until null pointer is reached)
 > >     postOrder(binaryTree[currentPointer].rightPointer)
 > > 
-> >         # (4) output root node's item (in one-line)
+> >     # (4) output root node's item (in one-line)
 > >     print(binaryTree[currentPointer].item, end=" ")
 > > ```
-> 
+> >
+> > ```
+> > PROCEDURE postOrder(BYVAL currentPointer: INTEGER)
+> >     IF currentPointer <> NULL_POINTER THEN
+> >         CALL postOrder(binaryTree[currentPointer].leftPointer)
+> >         CALL postOrder(binaryTree[currentPointer].rightPointer)
+> >         OUTPUT binaryTree[currentPointer].item, " "
+> >     ENDIF
+> > ENDPROCEDURE
+> > ```
+>
 > **Example Main Program**
-> 
+>
 > ```python
->tabulate()
+> tabulate()
 > # OUTPUT:
-># INDEX   ITEM    LEFT    RIGHT
+> # INDEX   ITEM    LEFT    RIGHT
 > # 0       None    -1      -1
 > # 1       None    -1      -1
 > # 2       None    -1      -1
@@ -901,6 +1557,25 @@
 > 
 > postOrder(rootPointer)  # OUTPUT: 10 20 70 80 50
 > print("")  # to output newline after traversal
+> ```
+>
+> ```
+> CALL tabulate()
+> 
+> CALL add(50)
+> CALL add(20)
+> CALL add(80)
+> CALL add(10)
+> CALL add(70)
+> CALL add(40)
+> CALL tabulate()
+> 
+> OUTPUT find(rootPointer, 70)
+> OUTPUT find(rootPointer, 100)
+> 
+> CALL preOrder(rootPointer)
+> CALL inOrder(rootPointer)
+> CALL postOrder(rootPointer)
 > ```
 
 > #### Binary Tree (OOP-based)
@@ -1276,3 +1951,69 @@
 > del player1  # OUTPUT: "Player was destroyed."
 > del official1  # OUTPUT: "Official was destroyed."
 > ```
+
+### Exception Handling
+
+- An **exception** is an unexpected event that disrupts the execution of a program.
+- **Exception handling** is the process of responding to an exception within the program without the program crashing / halting unexpectedly.
+
+> #### Example #1 - Catching generic errors
+>
+> ```python
+> try:
+>     a = b + c
+> except:
+>     print("Addition failed.")
+> else:
+>     print("Addition was successful.") 
+> ```
+>
+> ```
+> DECLARE a, b, c: INTEGER
+> 
+> TRY
+>     a <- b + c
+> EXCEPT
+>     OUTPUT "Addition failed."
+> ENDTRY
+> ```
+
+> #### Example #2 - Catching file handling errors
+>
+> ```python
+> try:
+>     file = open("myFile.txt", 'r')
+> except:
+>     print("File was not found.")
+> else:
+>     print("File was found.")
+> ```
+>
+> ```
+> TRY
+> 	OPENFILE "myFile.txt" FOR READ
+> EXCEPT
+> 	OUTPUT "File was not found."
+> ENDTRY
+> ```
+
+- You can even **specify which type of exception to catch** and thereby segment out your `expect` statements.
+  - Examples of exceptions include: **`EOFError`, `ImportError`, `IndexError`, `KeyError`, `NameError`, `TypeError`, `ValueError`, `ZeroDivisionError`, `FileNotFoundError`, `IOError`, `OSError`**.
+
+> #### Example #3 - Catching seperate / named errors
+>
+> ```python
+> try:
+>     x = 5 / 0
+> except ZeroDivisionError:
+>     print("You can't divide by zero.")
+> except:
+>     print("Some other error occured.")
+> else:
+>     print("No error occured.")
+> ```
+
+### File Handling
+
+- Access this [Google Drive](https://drive.google.com/drive/folders/1VSVq1nF8YzzG3uP205nIzF4cWi5xHhPF?usp=drive_link) to find implementation details of the **different file handling methods** in Python.
+
